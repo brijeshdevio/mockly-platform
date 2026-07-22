@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AcademyAcademyRouteRouteImport } from './routes/_academy/academy.route'
+import { Route as StudentStudentRouteRouteImport } from './routes/_student/student.route'
 import { Route as AcademyAcademyIndexRouteImport } from './routes/_academy/academy.index'
 import { Route as AcademyAcademyBillingRouteImport } from './routes/_academy/academy.billing'
 import { Route as AcademyAcademyCoursesRouteImport } from './routes/_academy/academy.courses'
@@ -22,6 +23,10 @@ import { Route as AcademyAcademyTestsRouteImport } from './routes/_academy/acade
 import { Route as AuthAcademyLoginRouteImport } from './routes/_auth/academy.login'
 import { Route as AuthAcademySignupRouteImport } from './routes/_auth/academy.signup'
 import { Route as AuthStudentLoginRouteImport } from './routes/_auth/student.login'
+import { Route as StudentStudentIndexRouteImport } from './routes/_student/student.index'
+import { Route as StudentStudentResultsRouteImport } from './routes/_student/student.results'
+import { Route as StudentStudentSettingsRouteImport } from './routes/_student/student.settings'
+import { Route as StudentStudentTestsRouteImport } from './routes/_student/student.tests'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -35,6 +40,11 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
 const AcademyAcademyRouteRoute = AcademyAcademyRouteRouteImport.update({
   id: '/_academy/academy',
   path: '/academy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentStudentRouteRoute = StudentStudentRouteRouteImport.update({
+  id: '/_student/student',
+  path: '/student',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AcademyAcademyIndexRoute = AcademyAcademyIndexRouteImport.update({
@@ -87,10 +97,31 @@ const AuthStudentLoginRoute = AuthStudentLoginRouteImport.update({
   path: '/student/login',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const StudentStudentIndexRoute = StudentStudentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StudentStudentRouteRoute,
+} as any)
+const StudentStudentResultsRoute = StudentStudentResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => StudentStudentRouteRoute,
+} as any)
+const StudentStudentSettingsRoute = StudentStudentSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => StudentStudentRouteRoute,
+} as any)
+const StudentStudentTestsRoute = StudentStudentTestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
+  getParentRoute: () => StudentStudentRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/academy': typeof AcademyAcademyRouteRouteWithChildren
+  '/student': typeof StudentStudentRouteRouteWithChildren
   '/academy/billing': typeof AcademyAcademyBillingRoute
   '/academy/courses': typeof AcademyAcademyCoursesRoute
   '/academy/results': typeof AcademyAcademyResultsRoute
@@ -100,7 +131,11 @@ export interface FileRoutesByFullPath {
   '/academy/login': typeof AuthAcademyLoginRoute
   '/academy/signup': typeof AuthAcademySignupRoute
   '/student/login': typeof AuthStudentLoginRoute
+  '/student/results': typeof StudentStudentResultsRoute
+  '/student/settings': typeof StudentStudentSettingsRoute
+  '/student/tests': typeof StudentStudentTestsRoute
   '/academy/': typeof AcademyAcademyIndexRoute
+  '/student/': typeof StudentStudentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,13 +148,18 @@ export interface FileRoutesByTo {
   '/academy/login': typeof AuthAcademyLoginRoute
   '/academy/signup': typeof AuthAcademySignupRoute
   '/student/login': typeof AuthStudentLoginRoute
+  '/student/results': typeof StudentStudentResultsRoute
+  '/student/settings': typeof StudentStudentSettingsRoute
+  '/student/tests': typeof StudentStudentTestsRoute
   '/academy': typeof AcademyAcademyIndexRoute
+  '/student': typeof StudentStudentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_academy/academy': typeof AcademyAcademyRouteRouteWithChildren
+  '/_student/student': typeof StudentStudentRouteRouteWithChildren
   '/_academy/academy/billing': typeof AcademyAcademyBillingRoute
   '/_academy/academy/courses': typeof AcademyAcademyCoursesRoute
   '/_academy/academy/results': typeof AcademyAcademyResultsRoute
@@ -129,13 +169,18 @@ export interface FileRoutesById {
   '/_auth/academy/login': typeof AuthAcademyLoginRoute
   '/_auth/academy/signup': typeof AuthAcademySignupRoute
   '/_auth/student/login': typeof AuthStudentLoginRoute
+  '/_student/student/results': typeof StudentStudentResultsRoute
+  '/_student/student/settings': typeof StudentStudentSettingsRoute
+  '/_student/student/tests': typeof StudentStudentTestsRoute
   '/_academy/academy/': typeof AcademyAcademyIndexRoute
+  '/_student/student/': typeof StudentStudentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/academy'
+    | '/student'
     | '/academy/billing'
     | '/academy/courses'
     | '/academy/results'
@@ -145,7 +190,11 @@ export interface FileRouteTypes {
     | '/academy/login'
     | '/academy/signup'
     | '/student/login'
+    | '/student/results'
+    | '/student/settings'
+    | '/student/tests'
     | '/academy/'
+    | '/student/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -158,12 +207,17 @@ export interface FileRouteTypes {
     | '/academy/login'
     | '/academy/signup'
     | '/student/login'
+    | '/student/results'
+    | '/student/settings'
+    | '/student/tests'
     | '/academy'
+    | '/student'
   id:
     | '__root__'
     | '/'
     | '/_auth'
     | '/_academy/academy'
+    | '/_student/student'
     | '/_academy/academy/billing'
     | '/_academy/academy/courses'
     | '/_academy/academy/results'
@@ -173,13 +227,18 @@ export interface FileRouteTypes {
     | '/_auth/academy/login'
     | '/_auth/academy/signup'
     | '/_auth/student/login'
+    | '/_student/student/results'
+    | '/_student/student/settings'
+    | '/_student/student/tests'
     | '/_academy/academy/'
+    | '/_student/student/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   AcademyAcademyRouteRoute: typeof AcademyAcademyRouteRouteWithChildren
+  StudentStudentRouteRoute: typeof StudentStudentRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -203,6 +262,13 @@ declare module '@tanstack/react-router' {
       path: '/academy'
       fullPath: '/academy'
       preLoaderRoute: typeof AcademyAcademyRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_student/student': {
+      id: '/_student/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentStudentRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_academy/academy/': {
@@ -275,6 +341,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthStudentLoginRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_student/student/': {
+      id: '/_student/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof StudentStudentIndexRouteImport
+      parentRoute: typeof StudentStudentRouteRoute
+    }
+    '/_student/student/results': {
+      id: '/_student/student/results'
+      path: '/results'
+      fullPath: '/student/results'
+      preLoaderRoute: typeof StudentStudentResultsRouteImport
+      parentRoute: typeof StudentStudentRouteRoute
+    }
+    '/_student/student/settings': {
+      id: '/_student/student/settings'
+      path: '/settings'
+      fullPath: '/student/settings'
+      preLoaderRoute: typeof StudentStudentSettingsRouteImport
+      parentRoute: typeof StudentStudentRouteRoute
+    }
+    '/_student/student/tests': {
+      id: '/_student/student/tests'
+      path: '/tests'
+      fullPath: '/student/tests'
+      preLoaderRoute: typeof StudentStudentTestsRouteImport
+      parentRoute: typeof StudentStudentRouteRoute
+    }
   }
 }
 
@@ -317,10 +411,28 @@ const AcademyAcademyRouteRouteChildren: AcademyAcademyRouteRouteChildren = {
 const AcademyAcademyRouteRouteWithChildren =
   AcademyAcademyRouteRoute._addFileChildren(AcademyAcademyRouteRouteChildren)
 
+interface StudentStudentRouteRouteChildren {
+  StudentStudentResultsRoute: typeof StudentStudentResultsRoute
+  StudentStudentSettingsRoute: typeof StudentStudentSettingsRoute
+  StudentStudentTestsRoute: typeof StudentStudentTestsRoute
+  StudentStudentIndexRoute: typeof StudentStudentIndexRoute
+}
+
+const StudentStudentRouteRouteChildren: StudentStudentRouteRouteChildren = {
+  StudentStudentResultsRoute: StudentStudentResultsRoute,
+  StudentStudentSettingsRoute: StudentStudentSettingsRoute,
+  StudentStudentTestsRoute: StudentStudentTestsRoute,
+  StudentStudentIndexRoute: StudentStudentIndexRoute,
+}
+
+const StudentStudentRouteRouteWithChildren =
+  StudentStudentRouteRoute._addFileChildren(StudentStudentRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   AcademyAcademyRouteRoute: AcademyAcademyRouteRouteWithChildren,
+  StudentStudentRouteRoute: StudentStudentRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
