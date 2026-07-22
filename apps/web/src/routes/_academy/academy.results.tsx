@@ -3,49 +3,18 @@ import { useState } from "react";
 import { ChevronDown, Check, Download, Eye, Search, X } from "lucide-react";
 import { AppShell } from "@/components/mockly/AppShell";
 import { Badge, Btn, Card, KPI } from "@/components/mockly/ui";
+import { testResults, type TestResult } from "@/lib/mock/academy/results";
 
 export const Route = createFileRoute("/_academy/academy/results")({
   head: () => ({ meta: [{ title: "Results · Academy · Mockly" }] }),
+  loader: () => ({ items: testResults }),
   component: Results,
 });
 
-const rows = [
-  ["Ananya Verma", "CCC", "Mock Paper 4", 84, 100, "Pass", "Today, 10:12"],
-  ["Sana Malik", "ADCA", "Mock 2", 76, 100, "Pass", "Today, 09:04"],
-  ["Vikram Singh", "CCC", "Mock Paper 1", 48, 100, "Fail", "Yesterday, 18:30"],
-  [
-    "Priya Iyer",
-    "O Level",
-    "IT Tools · Set 2",
-    71,
-    100,
-    "Pass",
-    "Yesterday, 16:22",
-  ],
-  ["Kabir Nair", "CCC", "Mock Paper 2", 66, 100, "Pass", "Yesterday, 14:10"],
-  ["Meera Gupta", "ADCA", "Mock 1", 82, 100, "Pass", "Mon, 11:44"],
-  [
-    "Aarav Shah",
-    "O Level",
-    "Web Design · Set 1",
-    59,
-    100,
-    "Pass",
-    "Mon, 10:02",
-  ],
-  [
-    "Rohit Kumar",
-    "O Level",
-    "Networking · Set 1",
-    41,
-    100,
-    "Fail",
-    "Sun, 15:20",
-  ],
-] as const;
-
 function Results() {
-  const [detail, setDetail] = useState<(typeof rows)[number] | null>(null);
+  const { items } = Route.useLoaderData();
+
+  const [detail, setDetail] = useState<(typeof items)[number] | null>(null);
   return (
     <AppShell
       role="academy"
@@ -97,46 +66,50 @@ function Results() {
               </tr>
             </thead>
             <tbody className="divide-y divide-hairline">
-              {rows.map((r) => {
-                const [name, course, test, score, out, status, date] = r;
-                const pct = Math.round((score / out) * 100);
+              {items.map((result) => {
                 return (
                   <tr
-                    key={`${name}-${test}`}
+                    key={`${result.studentName}-${result.testName}`}
                     className="group hover:bg-accent/40"
                   >
-                    <td className="px-6 py-3.5 font-medium">{name}</td>
+                    <td className="px-6 py-3.5 font-medium">
+                      {result.studentName}
+                    </td>
                     <td className="px-6 py-3.5">
-                      <Badge tone="neutral">{course}</Badge>
+                      <Badge tone="neutral">{result.course}</Badge>
                     </td>
                     <td className="px-6 py-3.5 text-muted-foreground">
-                      {test}
+                      {result.testName}
                     </td>
                     <td className="px-6 py-3.5 font-mono text-[12.5px]">
-                      {score}/{out}
+                      {result.score}/{result.totalMarks}
                     </td>
                     <td className="px-6 py-3.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{pct}%</span>
+                        <span className="font-medium">
+                          {result.percentage}%
+                        </span>
                         <span className="h-1 w-16 overflow-hidden rounded-full bg-accent">
                           <span
                             className="block h-full rounded-full bg-primary"
-                            style={{ width: `${pct}%` }}
+                            style={{ width: `${result.percentage}%` }}
                           />
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3.5">
-                      <Badge tone={status === "Pass" ? "success" : "danger"}>
-                        {status}
+                      <Badge
+                        tone={result.status === "Pass" ? "success" : "danger"}
+                      >
+                        {result.status}
                       </Badge>
                     </td>
                     <td className="px-6 py-3.5 text-muted-foreground">
-                      {date}
+                      {result.date}
                     </td>
                     <td className="px-6 py-3.5 text-right">
                       <button
-                        onClick={() => setDetail(r)}
+                        onClick={() => setDetail(result)}
                         className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[12px] font-medium text-primary opacity-0 group-hover:opacity-100 hover:bg-accent"
                       >
                         <Eye className="h-3.5 w-3.5" /> Review
@@ -161,7 +134,9 @@ function Results() {
         </div>
       </Card>
 
-      {detail && <ResultDetail row={detail} onClose={() => setDetail(null)} />}
+      {detail && (
+        <ResultDetail items={detail} onClose={() => setDetail(null)} />
+      )}
     </AppShell>
   );
 }
@@ -176,13 +151,13 @@ function FilterChip({ label }: { label: string }) {
 }
 
 function ResultDetail({
-  row,
+  items,
   onClose,
 }: {
-  row: (typeof rows)[number];
+  items: TestResult;
   onClose: () => void;
 }) {
-  const [name, course, test, score, out, status] = row;
+  const { studentName, course, testName, score, totalMarks, status } = items;
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-(--brand-ink)/40 backdrop-blur-sm">
       <div className="flex h-full w-full max-w-2xl flex-col border-l border-hairline bg-card">
@@ -192,10 +167,11 @@ function ResultDetail({
               Result review · Read only
             </p>
             <h3 className="mt-2 text-[20px] font-semibold tracking-tight">
-              {name} · {test}
+              {studentName} · {testName}
             </h3>
             <p className="mt-0.5 text-[12.5px] text-muted-foreground">
-              {course} · {score}/{out} · {Math.round((score / out) * 100)}% ·{" "}
+              {course} · {score}/{totalMarks} ·{" "}
+              {Math.round((score / totalMarks) * 100)}% ·{" "}
               <Badge
                 tone={status === "Pass" ? "success" : "danger"}
                 className="ml-1"
@@ -215,7 +191,7 @@ function ResultDetail({
           <div className="grid grid-cols-3 gap-3">
             {[
               ["Correct", `${score}`, "success"],
-              ["Incorrect", `${out - score}`, "danger"],
+              ["Incorrect", `${totalMarks - score}`, "danger"],
               ["Time taken", "38 min", "neutral"],
             ].map(([k, v, t]) => (
               <div

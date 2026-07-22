@@ -200,3 +200,14 @@ export function EmptyState({
     </div>
   );
 }
+
+export function Avatar({ name }: { name: string }) {
+  return (
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-[11.5px] font-semibold text-(--brand-ink)">
+      {name
+        .split(" ")
+        .map((w) => w[0])
+        .join("")}
+    </div>
+  );
+}

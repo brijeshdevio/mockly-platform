@@ -10,26 +10,19 @@ import {
   X,
 } from "lucide-react";
 import { AppShell } from "@/components/mockly/AppShell";
-import { Badge, Btn, Card, Input } from "@/components/mockly/ui";
+import { Avatar, Badge, Btn, Card, Input } from "@/components/mockly/ui";
+import { students } from "@/lib/mock/academy/students";
 
 export const Route = createFileRoute("/_academy/academy/students")({
   head: () => ({ meta: [{ title: "Students · Academy · Mockly" }] }),
+  loader: () => ({ students }),
   component: Students,
 });
 
-const rows = [
-  ["Ananya Verma", "+91 98220 21048", "CCC", "STU-2049", "Active"],
-  ["Rohit Kumar", "+91 98771 44029", "O Level", "STU-2050", "Active"],
-  ["Sana Malik", "+91 98801 33127", "ADCA", "STU-2051", "Active"],
-  ["Vikram Singh", "+91 98991 90887", "CCC", "STU-2052", "Paused"],
-  ["Priya Iyer", "+91 90090 78843", "O Level", "STU-2053", "Active"],
-  ["Kabir Nair", "+91 98212 43109", "CCC", "STU-2054", "Active"],
-  ["Meera Gupta", "+91 88320 11220", "ADCA", "STU-2055", "Active"],
-  ["Aarav Shah", "+91 97110 44582", "O Level", "STU-2056", "Active"],
-] as const;
-
 function Students() {
   const [openDialog, setOpen] = useState(false);
+  const { students } = Route.useLoaderData();
+
   return (
     <AppShell
       role="academy"
@@ -75,30 +68,30 @@ function Students() {
               </tr>
             </thead>
             <tbody className="divide-y divide-hairline">
-              {rows.map(([name, phone, course, code, status]) => (
-                <tr key={code} className="group hover:bg-accent/40">
+              {students.map((student) => (
+                <tr key={student.id} className="group hover:bg-accent/40">
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-(--brand-ink)">
-                        {name
-                          .split(" ")
-                          .map((w) => w[0])
-                          .join("")}
-                      </div>
-                      <span className="font-medium">{name}</span>
+                      <Avatar name={student.name} />
+
+                      <span className="font-medium">{student.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-3.5 text-muted-foreground">{phone}</td>
+                  <td className="px-6 py-3.5 text-muted-foreground">
+                    {student.phone}
+                  </td>
                   <td className="px-6 py-3.5">
-                    <Badge tone="neutral">{course}</Badge>
+                    <Badge tone="neutral">{student.course}</Badge>
                   </td>
                   <td className="px-6 py-3.5 font-mono text-[12px] text-muted-foreground">
-                    {code}
+                    {student.course}
                   </td>
                   <td className="px-6 py-3.5">
-                    <Badge tone={status === "Active" ? "success" : "warning"}>
+                    <Badge
+                      tone={student.status === "Active" ? "success" : "warning"}
+                    >
                       <span className="h-1.5 w-1.5 rounded-full bg-current" />{" "}
-                      {status}
+                      {student.status}
                     </Badge>
                   </td>
                   <td className="px-6 py-3.5 text-right">

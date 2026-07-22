@@ -2,45 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ClipboardList, Search, Timer } from "lucide-react";
 import { AppShell } from "@/components/mockly/AppShell";
 import { Badge, Card } from "@/components/mockly/ui";
+import { courseTests } from "@/lib/mock/academy/tests";
 
 export const Route = createFileRoute("/_academy/academy/tests")({
   head: () => ({ meta: [{ title: "Tests · Academy · Mockly" }] }),
+  loader: () => ({ items: courseTests }),
   component: Tests,
 });
 
-const grouped = [
-  {
-    course: "CCC",
-    tone: "accent" as const,
-    tests: [
-      ["Mock Paper 1", 100, 45, 50],
-      ["Mock Paper 2", 100, 45, 50],
-      ["Mock Paper 3", 100, 45, 50],
-      ["Mock Paper 4", 100, 45, 50],
-    ],
-  },
-  {
-    course: "O Level",
-    tone: "info" as const,
-    tests: [
-      ["M1-R5 · IT Tools · Set 1", 100, 90, 50],
-      ["M1-R5 · IT Tools · Set 2", 100, 90, 50],
-      ["M2-R5 · Web Design · Set 1", 100, 90, 50],
-      ["M4-R5 · Networking · Set 1", 100, 90, 50],
-    ],
-  },
-  {
-    course: "ADCA",
-    tone: "success" as const,
-    tests: [
-      ["ADCA · Mock 1", 80, 60, 50],
-      ["ADCA · Mock 2", 80, 60, 50],
-      ["ADCA · Mock 3", 80, 60, 50],
-    ],
-  },
-];
-
 function Tests() {
+  const { items } = Route.useLoaderData();
+
   return (
     <AppShell
       role="academy"
@@ -57,13 +29,13 @@ function Tests() {
       }
     >
       <div className="space-y-10">
-        {grouped.map((g) => (
+        {items.map((g) => (
           <section key={g.course}>
             <div className="mb-4 flex items-center gap-3">
               <h2 className="text-[16px] font-semibold tracking-tight">
                 {g.course}
               </h2>
-              <Badge tone={g.tone}>{g.tests.length} tests</Badge>
+              <Badge>{g.tests.length} tests</Badge>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {g.tests.map(([name, q, mins, pass]) => (

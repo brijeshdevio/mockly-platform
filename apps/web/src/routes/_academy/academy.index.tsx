@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowUpRight,
   ClipboardList,
@@ -9,36 +9,29 @@ import {
   Users,
 } from "lucide-react";
 import { AppShell } from "@/components/mockly/AppShell";
-import { Badge, Btn, Card, KPI, SectionHeader } from "@/components/mockly/ui";
+import {
+  Avatar,
+  Badge,
+  Btn,
+  Card,
+  KPI,
+  SectionHeader,
+} from "@/components/mockly/ui";
+import { dashboardStats } from "@/lib/mock/academy/dashboardStats";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_academy/academy/")({
   head: () => ({
     meta: [{ title: "Dashboard · Academy · Mockly" }],
   }),
+  loader: () => dashboardStats,
   component: AcademyDashboard,
 });
 
-const activity = [
-  ["Ananya Verma", "Completed CCC · Mock 4", "84%", "success", "2 min ago"],
-  [
-    "Rohit Kumar",
-    "Started O Level · Networking",
-    "In progress",
-    "warning",
-    "8 min ago",
-  ],
-  ["Sana Malik", "Completed ADCA · Mock 2", "76%", "success", "22 min ago"],
-  ["Vikram Singh", "Completed CCC · Mock 1", "48%", "danger", "1 h ago"],
-  [
-    "Priya Iyer",
-    "Resumed O Level · IT Tools",
-    "In progress",
-    "warning",
-    "1 h ago",
-  ],
-] as const;
-
 function AcademyDashboard() {
+  const { overview, recentActivity, courseDistribution } =
+    Route.useLoaderData();
+
   return (
     <AppShell
       role="academy"
@@ -57,27 +50,27 @@ function AcademyDashboard() {
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KPI
-          label="Total students"
-          value="248"
-          hint="12 added this week"
+          label={overview.totalStudents.title}
+          value={overview.totalStudents.value}
+          hint={overview.totalStudents.hint}
           icon={<Users className="h-4 w-4" />}
         />
         <KPI
-          label="Total courses"
-          value="3"
-          hint="CCC · O Level · ADCA"
+          label={overview.totalCourses.title}
+          value={overview.totalCourses.value}
+          hint={overview.totalCourses.hint}
           icon={<GraduationCap className="h-4 w-4" />}
         />
         <KPI
-          label="Total tests"
-          value="24"
-          hint="Across all courses"
+          label={overview.totalTests.title}
+          value={overview.totalTests.value}
+          hint={overview.totalTests.hint}
           icon={<ClipboardList className="h-4 w-4" />}
         />
         <KPI
-          label="Average score"
-          value="72%"
-          hint="+3.4 vs last month"
+          label={overview.averageScore.title}
+          value={overview.averageScore.value}
+          hint={overview.averageScore.hint}
           accent
           icon={<TrendingUp className="h-4 w-4" />}
         />
@@ -89,34 +82,35 @@ function AcademyDashboard() {
             title="Recent activity"
             description="Live feed of student attempts across all courses."
             action={
-              <Btn variant="ghost" size="sm">
-                View all <ArrowUpRight className="h-3.5 w-3.5" />
-              </Btn>
+              <Link to="/academy/tests">
+                <Button variant={"ghost"}>
+                  View all <ArrowUpRight className="h-3.5 w-3.5" />
+                </Button>
+              </Link>
             }
           />
           <div className="divide-y divide-hairline">
-            {activity.map(([name, action, score, tone, when]) => (
+            {recentActivity.map((activity) => (
               <div
-                key={name}
+                key={activity.name}
                 className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0"
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-[11.5px] font-semibold text-(--brand-ink)">
-                  {name
-                    .split(" ")
-                    .map((w) => w[0])
-                    .join("")}
-                </div>
+                <Avatar name={activity.name} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13.5px] font-medium">{name}</p>
+                  <p className="truncate text-[13.5px] font-medium">
+                    {activity.name}
+                  </p>
                   <p className="truncate text-[12px] text-muted-foreground">
-                    {action}
+                    {activity.action}
                   </p>
                 </div>
-                <Badge tone={tone as "success" | "warning" | "danger"}>
-                  {score}
+                <Badge
+                  tone={activity.statusType as "success" | "warning" | "danger"}
+                >
+                  {activity.statusLabel}
                 </Badge>
                 <span className="hidden text-[11.5px] text-muted-foreground sm:inline">
-                  {when}
+                  {activity.timeAgo}
                 </span>
               </div>
             ))}
@@ -127,20 +121,20 @@ function AcademyDashboard() {
           <Card className="p-6">
             <SectionHeader title="Course distribution" />
             <div className="space-y-3.5">
-              {[
-                ["CCC", 128, 248],
-                ["O Level", 74, 248],
-                ["ADCA", 46, 248],
-              ].map(([label, val, total]) => {
+              {courseDistribution.map((course) => {
                 const pct = Math.round(
-                  ((val as number) / (total as number)) * 100
+                  (course.studentCount / Number(overview.totalStudents.value)) *
+                    100,
                 );
                 return (
-                  <div key={label as string}>
+                  <div key={course.courseName}>
                     <div className="mb-1.5 flex items-baseline justify-between text-[12.5px]">
-                      <span className="font-medium">{label}</span>
+                      <span className="font-medium">{course.courseName}</span>
                       <span className="text-muted-foreground">
-                        {val} <span className="text-[11px]">· {pct}%</span>
+                        {course.studentCount}{" "}
+                        <span className="text-[11px]">
+                          · {course.percentage}%
+                        </span>
                       </span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-accent">
@@ -153,34 +147,6 @@ function AcademyDashboard() {
                 );
               })}
             </div>
-          </Card>
-          <Card className="p-6">
-            <SectionHeader title="Getting started" />
-            <ul className="space-y-2.5 text-[13px]">
-              {[
-                ["Add your first batch of students", true],
-                ["Share Institute Code with students", true],
-                ["Assign a course to each student", false],
-                ["Encourage first mock attempt", false],
-              ].map(([t, done]) => (
-                <li key={t as string} className="flex items-center gap-3">
-                  <span
-                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                      done
-                        ? "bg-primary text-primary-foreground"
-                        : "border border-hairline bg-background text-muted-foreground"
-                    }`}
-                  >
-                    {done ? "✓" : ""}
-                  </span>
-                  <span
-                    className={done ? "text-muted-foreground line-through" : ""}
-                  >
-                    {t}
-                  </span>
-                </li>
-              ))}
-            </ul>
           </Card>
         </div>
       </div>
