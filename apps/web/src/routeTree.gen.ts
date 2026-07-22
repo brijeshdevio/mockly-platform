@@ -11,6 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
+import { Route as AcademyAcademyRouteRouteImport } from './routes/_academy/academy.route'
+import { Route as AcademyAcademyIndexRouteImport } from './routes/_academy/academy.index'
+import { Route as AcademyAcademyBillingRouteImport } from './routes/_academy/academy.billing'
+import { Route as AcademyAcademyCoursesRouteImport } from './routes/_academy/academy.courses'
+import { Route as AcademyAcademyResultsRouteImport } from './routes/_academy/academy.results'
+import { Route as AcademyAcademySettingsRouteImport } from './routes/_academy/academy.settings'
+import { Route as AcademyAcademyStudentsRouteImport } from './routes/_academy/academy.students'
+import { Route as AcademyAcademyTestsRouteImport } from './routes/_academy/academy.tests'
 import { Route as AuthAcademyLoginRouteImport } from './routes/_auth/academy.login'
 import { Route as AuthAcademySignupRouteImport } from './routes/_auth/academy.signup'
 import { Route as AuthStudentLoginRouteImport } from './routes/_auth/student.login'
@@ -23,6 +31,46 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AcademyAcademyRouteRoute = AcademyAcademyRouteRouteImport.update({
+  id: '/_academy/academy',
+  path: '/academy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcademyAcademyIndexRoute = AcademyAcademyIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AcademyAcademyRouteRoute,
+} as any)
+const AcademyAcademyBillingRoute = AcademyAcademyBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AcademyAcademyRouteRoute,
+} as any)
+const AcademyAcademyCoursesRoute = AcademyAcademyCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => AcademyAcademyRouteRoute,
+} as any)
+const AcademyAcademyResultsRoute = AcademyAcademyResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => AcademyAcademyRouteRoute,
+} as any)
+const AcademyAcademySettingsRoute = AcademyAcademySettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AcademyAcademyRouteRoute,
+} as any)
+const AcademyAcademyStudentsRoute = AcademyAcademyStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => AcademyAcademyRouteRoute,
+} as any)
+const AcademyAcademyTestsRoute = AcademyAcademyTestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
+  getParentRoute: () => AcademyAcademyRouteRoute,
 } as any)
 const AuthAcademyLoginRoute = AuthAcademyLoginRouteImport.update({
   id: '/academy/login',
@@ -42,41 +90,96 @@ const AuthStudentLoginRoute = AuthStudentLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/academy': typeof AcademyAcademyRouteRouteWithChildren
+  '/academy/billing': typeof AcademyAcademyBillingRoute
+  '/academy/courses': typeof AcademyAcademyCoursesRoute
+  '/academy/results': typeof AcademyAcademyResultsRoute
+  '/academy/settings': typeof AcademyAcademySettingsRoute
+  '/academy/students': typeof AcademyAcademyStudentsRoute
+  '/academy/tests': typeof AcademyAcademyTestsRoute
   '/academy/login': typeof AuthAcademyLoginRoute
   '/academy/signup': typeof AuthAcademySignupRoute
   '/student/login': typeof AuthStudentLoginRoute
+  '/academy/': typeof AcademyAcademyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/academy/billing': typeof AcademyAcademyBillingRoute
+  '/academy/courses': typeof AcademyAcademyCoursesRoute
+  '/academy/results': typeof AcademyAcademyResultsRoute
+  '/academy/settings': typeof AcademyAcademySettingsRoute
+  '/academy/students': typeof AcademyAcademyStudentsRoute
+  '/academy/tests': typeof AcademyAcademyTestsRoute
   '/academy/login': typeof AuthAcademyLoginRoute
   '/academy/signup': typeof AuthAcademySignupRoute
   '/student/login': typeof AuthStudentLoginRoute
+  '/academy': typeof AcademyAcademyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/_academy/academy': typeof AcademyAcademyRouteRouteWithChildren
+  '/_academy/academy/billing': typeof AcademyAcademyBillingRoute
+  '/_academy/academy/courses': typeof AcademyAcademyCoursesRoute
+  '/_academy/academy/results': typeof AcademyAcademyResultsRoute
+  '/_academy/academy/settings': typeof AcademyAcademySettingsRoute
+  '/_academy/academy/students': typeof AcademyAcademyStudentsRoute
+  '/_academy/academy/tests': typeof AcademyAcademyTestsRoute
   '/_auth/academy/login': typeof AuthAcademyLoginRoute
   '/_auth/academy/signup': typeof AuthAcademySignupRoute
   '/_auth/student/login': typeof AuthStudentLoginRoute
+  '/_academy/academy/': typeof AcademyAcademyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/academy/login' | '/academy/signup' | '/student/login'
+  fullPaths:
+    | '/'
+    | '/academy'
+    | '/academy/billing'
+    | '/academy/courses'
+    | '/academy/results'
+    | '/academy/settings'
+    | '/academy/students'
+    | '/academy/tests'
+    | '/academy/login'
+    | '/academy/signup'
+    | '/student/login'
+    | '/academy/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/academy/login' | '/academy/signup' | '/student/login'
+  to:
+    | '/'
+    | '/academy/billing'
+    | '/academy/courses'
+    | '/academy/results'
+    | '/academy/settings'
+    | '/academy/students'
+    | '/academy/tests'
+    | '/academy/login'
+    | '/academy/signup'
+    | '/student/login'
+    | '/academy'
   id:
     | '__root__'
     | '/'
     | '/_auth'
+    | '/_academy/academy'
+    | '/_academy/academy/billing'
+    | '/_academy/academy/courses'
+    | '/_academy/academy/results'
+    | '/_academy/academy/settings'
+    | '/_academy/academy/students'
+    | '/_academy/academy/tests'
     | '/_auth/academy/login'
     | '/_auth/academy/signup'
     | '/_auth/student/login'
+    | '/_academy/academy/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  AcademyAcademyRouteRoute: typeof AcademyAcademyRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -94,6 +197,62 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_academy/academy': {
+      id: '/_academy/academy'
+      path: '/academy'
+      fullPath: '/academy'
+      preLoaderRoute: typeof AcademyAcademyRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_academy/academy/': {
+      id: '/_academy/academy/'
+      path: '/'
+      fullPath: '/academy/'
+      preLoaderRoute: typeof AcademyAcademyIndexRouteImport
+      parentRoute: typeof AcademyAcademyRouteRoute
+    }
+    '/_academy/academy/billing': {
+      id: '/_academy/academy/billing'
+      path: '/billing'
+      fullPath: '/academy/billing'
+      preLoaderRoute: typeof AcademyAcademyBillingRouteImport
+      parentRoute: typeof AcademyAcademyRouteRoute
+    }
+    '/_academy/academy/courses': {
+      id: '/_academy/academy/courses'
+      path: '/courses'
+      fullPath: '/academy/courses'
+      preLoaderRoute: typeof AcademyAcademyCoursesRouteImport
+      parentRoute: typeof AcademyAcademyRouteRoute
+    }
+    '/_academy/academy/results': {
+      id: '/_academy/academy/results'
+      path: '/results'
+      fullPath: '/academy/results'
+      preLoaderRoute: typeof AcademyAcademyResultsRouteImport
+      parentRoute: typeof AcademyAcademyRouteRoute
+    }
+    '/_academy/academy/settings': {
+      id: '/_academy/academy/settings'
+      path: '/settings'
+      fullPath: '/academy/settings'
+      preLoaderRoute: typeof AcademyAcademySettingsRouteImport
+      parentRoute: typeof AcademyAcademyRouteRoute
+    }
+    '/_academy/academy/students': {
+      id: '/_academy/academy/students'
+      path: '/students'
+      fullPath: '/academy/students'
+      preLoaderRoute: typeof AcademyAcademyStudentsRouteImport
+      parentRoute: typeof AcademyAcademyRouteRoute
+    }
+    '/_academy/academy/tests': {
+      id: '/_academy/academy/tests'
+      path: '/tests'
+      fullPath: '/academy/tests'
+      preLoaderRoute: typeof AcademyAcademyTestsRouteImport
+      parentRoute: typeof AcademyAcademyRouteRoute
     }
     '/_auth/academy/login': {
       id: '/_auth/academy/login'
@@ -135,9 +294,33 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface AcademyAcademyRouteRouteChildren {
+  AcademyAcademyBillingRoute: typeof AcademyAcademyBillingRoute
+  AcademyAcademyCoursesRoute: typeof AcademyAcademyCoursesRoute
+  AcademyAcademyResultsRoute: typeof AcademyAcademyResultsRoute
+  AcademyAcademySettingsRoute: typeof AcademyAcademySettingsRoute
+  AcademyAcademyStudentsRoute: typeof AcademyAcademyStudentsRoute
+  AcademyAcademyTestsRoute: typeof AcademyAcademyTestsRoute
+  AcademyAcademyIndexRoute: typeof AcademyAcademyIndexRoute
+}
+
+const AcademyAcademyRouteRouteChildren: AcademyAcademyRouteRouteChildren = {
+  AcademyAcademyBillingRoute: AcademyAcademyBillingRoute,
+  AcademyAcademyCoursesRoute: AcademyAcademyCoursesRoute,
+  AcademyAcademyResultsRoute: AcademyAcademyResultsRoute,
+  AcademyAcademySettingsRoute: AcademyAcademySettingsRoute,
+  AcademyAcademyStudentsRoute: AcademyAcademyStudentsRoute,
+  AcademyAcademyTestsRoute: AcademyAcademyTestsRoute,
+  AcademyAcademyIndexRoute: AcademyAcademyIndexRoute,
+}
+
+const AcademyAcademyRouteRouteWithChildren =
+  AcademyAcademyRouteRoute._addFileChildren(AcademyAcademyRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  AcademyAcademyRouteRoute: AcademyAcademyRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
