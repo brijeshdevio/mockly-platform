@@ -1,0 +1,20 @@
+@base_url = http://localhost:5000/api/v1
+
+### - 
+GET {{base_url}}/
+
+
+### - 
+GET {{base_url}}/health
+
+
+###-
+POST {{base_url}}/auth/academy/signup
+Content-Type: application/json
+
+{
+  "academyName": "Bright Future Academy",
+  "ownerName": "Rahul Sharma",
+  "phone": "9876543212",
+  "password": "StrongPassword123"
+}
