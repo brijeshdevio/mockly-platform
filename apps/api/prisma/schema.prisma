@@ -1,0 +1,345 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum StudentStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PlanDuration {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  AUTO_SUBMITTED
+}
+
+model SubscriptionPlan {
+  id String @id @default(cuid())
+
+  name String
+
+  duration PlanDuration
+
+  price Decimal @db.Decimal(10, 2)
+
+  maxStudents Int?
+
+  isActive Boolean @default(true)
+
+  subscriptions AcademySubscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id String @id @default(cuid())
+
+  subscriptionId String
+  subscription   AcademySubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount Decimal @db.Decimal(10, 2)
+
+  status PaymentStatus @default(PENDING)
+
+  transactionId String? @unique
+
+  paymentMethod String?
+
+  paidAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([subscriptionId])
+}
+
+model Admin {
+  id           String @id @default(cuid())
+  name         String
+  phone        String @unique
+  passwordHash String
+
+  sessions AdminSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminSession {
+  id String @id @default(cuid())
+
+  adminId String
+  admin   Admin  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  refreshToken String   @unique
+  expiresAt    DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
+model Academy {
+  id String @id @default(cuid())
+
+  academyCode String @unique
+
+  academyName String
+  ownerName   String
+
+  phone        String @unique
+  passwordHash String
+
+  isActive Boolean @default(true)
+
+  students Student[]
+  sessions AcademySession[]
+
+  subscription AcademySubscription?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AcademySubscription {
+  id String @id @default(cuid())
+
+  academyId String  @unique
+  academy   Academy @relation(fields: [academyId], references: [id], onDelete: Cascade)
+
+  planId String
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  status SubscriptionStatus @default(ACTIVE)
+
+  startDate DateTime
+  endDate   DateTime
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([planId])
+}
+
+model AcademySession {
+  id String @id @default(cuid())
+
+  academyId String
+  academy   Academy @relation(fields: [academyId], references: [id], onDelete: Cascade)
+
+  refreshToken String   @unique
+  expiresAt    DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([academyId])
+}
+
+model Student {
+  id String @id @default(cuid())
+
+  academyId String
+  academy   Academy @relation(fields: [academyId], references: [id], onDelete: Cascade)
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Restrict)
+
+  studentCode String @unique
+
+  name  String
+  phone String
+
+  status StudentStatus @default(ACTIVE)
+
+  attempts StudentAttempt[]
+  sessions StudentSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([academyId, phone])
+  @@index([academyId])
+  @@index([courseId])
+}
+
+model StudentSession {
+  id String @id @default(cuid())
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  refreshToken String   @unique
+  expiresAt    DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model Course {
+  id   String @id @default(cuid())
+  code String @unique
+
+  name        String   @unique
+  description String?
+  modules     String[]
+
+  isActive Boolean @default(true)
+
+  students Student[]
+  tests    CourseTest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Test {
+  id String @id @default(cuid())
+
+  title       String
+  description String?
+
+  durationInMinutes Int
+
+  passingPercentage Int @default(50)
+
+  isPublished Boolean @default(false)
+
+  courses   CourseTest[]
+  questions TestQuestion[]
+
+  attempts StudentAttempt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Question {
+  id String @id @default(cuid())
+
+  question String
+
+  optionA String
+  optionB String
+  optionC String?
+  optionD String?
+
+  correctOption String
+
+  explanation String?
+
+  tests          TestQuestion[]
+  attemptAnswers StudentAttemptAnswer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CourseTest {
+  courseId String
+  testId   String
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  test   Test   @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([courseId, testId])
+  @@index([courseId])
+  @@index([testId])
+}
+
+model TestQuestion {
+  testId     String
+  questionId String
+
+  test     Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([testId, questionId])
+  @@index([testId])
+  @@index([questionId])
+}
+
+model StudentAttempt {
+  id String @id @default(cuid())
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  testId String
+  test   Test   @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  status AttemptStatus @default(IN_PROGRESS)
+
+  totalQuestions Int
+
+  attemptNumber       Int
+  correctAnswers      Int
+  wrongAnswers        Int
+  unansweredQuestions Int
+
+  score      Int
+  percentage Float
+  accuracy   Float
+
+  startedAt   DateTime
+  submittedAt DateTime?
+
+  answers StudentAttemptAnswer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, testId, attemptNumber])
+  @@index([studentId])
+  @@index([testId])
+}
+
+model StudentAttemptAnswer {
+  id String @id @default(cuid())
+
+  attemptId String
+  attempt   StudentAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+
+  selectedOption String?
+
+  isCorrect Boolean
+
+  createdAt DateTime @default(now())
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+}
