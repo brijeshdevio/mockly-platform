@@ -5,7 +5,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
 import { apiSuccessResponse, setCookie } from '../../common/helpers';
 import { COOKIE_MAX_AGE, COOKIE_NAME } from '../../common/constants';
 import { User } from '../../common/decorators';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../common/guards';
 import { Role } from '../../constants';
 
 import { AuthService } from './auth.service';
