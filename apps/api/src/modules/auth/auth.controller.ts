@@ -1,20 +1,23 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
+import { type Response } from 'express';
+import { ZodValidationPipe } from 'nestjs-zod';
 
-import { apiSuccessResponse } from '../../common/helpers';
+import { apiSuccessResponse, setCookie } from '../../common/helpers';
+import { COOKIE_MAX_AGE, COOKIE_NAME } from '../../common/constants';
 
 import { AuthService } from './auth.service';
-import { ZodValidationPipe } from 'nestjs-zod';
 import {
   AcademySignupDto,
   AcademySignupSchema,
 } from './dto/academy-signup.dto';
+import { AcademyLoginDto, AcademyLoginSchema } from './dto/academy-login.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('academy/signup')
-  async signup(
+  async academySignup(
     @Body(new ZodValidationPipe(AcademySignupSchema))
     body: AcademySignupDto,
   ) {
@@ -24,5 +27,25 @@ export class AuthController {
       message: 'Academy registered successfully',
       data,
     });
+  }
+
+  @Post('academy/login')
+  async academyLogin(
+    @Body(new ZodValidationPipe(AcademyLoginSchema))
+    body: AcademyLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken, refreshToken } =
+      await this.authService.academyLogin(body);
+
+    setCookie(res, COOKIE_NAME.ACCESS_TOKEN, accessToken, {
+      maxAge: COOKIE_MAX_AGE.ACCESS_TOKEN,
+    });
+
+    setCookie(res, COOKIE_NAME.REFRESH_TOKEN, refreshToken, {
+      maxAge: COOKIE_MAX_AGE.REFRESH_TOKEN,
+    });
+
+    return apiSuccessResponse({ message: 'Login successful' });
   }
 }

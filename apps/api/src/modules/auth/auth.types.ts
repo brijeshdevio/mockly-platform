@@ -5,3 +5,8 @@ export type AcademySignupResponse = {
   ownerName: string;
   phone: string;
 };
+
+export type AcademyLoginResponse = {
+  accessToken: string;
+  refreshToken: string;
+};

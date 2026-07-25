@@ -1,16 +1,26 @@
 import { randomInt } from 'node:crypto';
 
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import argon2 from 'argon2';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
 import { AcademySignupDto } from './dto/academy-signup.dto';
-import { AcademySignupResponse } from './auth.types';
+import { AcademyLoginDto } from './dto/academy-login.dto';
+import { AcademyLoginResponse, AcademySignupResponse } from './auth.types';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwt: JwtService,
+  ) {}
 
   private generateCode({ prefix = '', randomLength = 4 }): string {
     const now = new Date();
@@ -65,5 +75,68 @@ export class AuthService {
     });
 
     return academy;
+  }
+
+  async academyLogin(dto: AcademyLoginDto): Promise<AcademyLoginResponse> {
+    const academy = await this.prisma.academy.findUnique({
+      where: {
+        phone: dto.phone,
+      },
+      select: {
+        id: true,
+        passwordHash: true,
+        isActive: true,
+      },
+    });
+
+    if (!academy) {
+      throw new UnauthorizedException('Invalid phone number or password');
+    }
+
+    if (!academy.isActive) {
+      throw new ForbiddenException('Your academy account has been deactivated');
+    }
+
+    const passwordMatched = await argon2.verify(
+      academy.passwordHash,
+      dto.password,
+    );
+
+    if (!passwordMatched) {
+      throw new UnauthorizedException('Invalid phone number or password');
+    }
+
+    const accessToken = await this.jwt.signAsync(
+      {
+        sub: academy.id,
+        role: 'ACADEMY',
+      },
+      {
+        expiresIn: '15m',
+      },
+    );
+
+    const refreshToken = await this.jwt.signAsync(
+      {
+        sub: academy.id,
+        role: 'ACADEMY',
+      },
+      {
+        expiresIn: '30d',
+      },
+    );
+
+    await this.prisma.academySession.create({
+      data: {
+        academyId: academy.id,
+        refreshToken,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

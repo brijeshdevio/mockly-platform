@@ -18,3 +18,13 @@ Content-Type: application/json
   "phone": "9876543212",
   "password": "StrongPassword123"
 }
+
+
+###-
+POST {{base_url}}/auth/academy/login
+Content-Type: application/json
+
+{
+  "phone": "9876543212",
+  "password": "StrongPassword123"
+}
