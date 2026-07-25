@@ -28,3 +28,7 @@ Content-Type: application/json
   "phone": "9876543212",
   "password": "StrongPassword123"
 }
+
+
+###-
+GET {{base_url}}/auth/profile

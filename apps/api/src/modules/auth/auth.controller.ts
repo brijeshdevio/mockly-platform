@@ -1,9 +1,12 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { type Response } from 'express';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 import { apiSuccessResponse, setCookie } from '../../common/helpers';
 import { COOKIE_MAX_AGE, COOKIE_NAME } from '../../common/constants';
+import { User } from '../../common/decorators';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Role } from '../../constants';
 
 import { AuthService } from './auth.service';
 import {
@@ -47,5 +50,13 @@ export class AuthController {
     });
 
     return apiSuccessResponse({ message: 'Login successful' });
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@User('id') userId: string, @User('role') role: Role) {
+    const data = await this.authService.getProfile(userId, role);
+
+    return apiSuccessResponse({ data });
   }
 }

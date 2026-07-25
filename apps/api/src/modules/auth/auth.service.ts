@@ -4,16 +4,22 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import argon2 from 'argon2';
 
 import { PrismaService } from '../../prisma/prisma.service';
+import { Role } from '../../constants';
 
 import { AcademySignupDto } from './dto/academy-signup.dto';
 import { AcademyLoginDto } from './dto/academy-login.dto';
-import { AcademyLoginResponse, AcademySignupResponse } from './auth.types';
+import {
+  AcademyLoginResponse,
+  AcademySignupResponse,
+  ProfileResponse,
+} from './auth.types';
 
 @Injectable()
 export class AuthService {
@@ -138,5 +144,91 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async getProfile(userId: string, role: Role): Promise<ProfileResponse> {
+    switch (role) {
+      case Role.ADMIN: {
+        const admin = await this.prisma.admin.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        });
+
+        if (!admin) {
+          throw new NotFoundException('Admin not found');
+        }
+
+        return {
+          role,
+          ...admin,
+        };
+      }
+
+      case Role.ACADEMY: {
+        const academy = await this.prisma.academy.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            academyCode: true,
+            academyName: true,
+            ownerName: true,
+            phone: true,
+            isActive: true,
+          },
+        });
+
+        if (!academy) {
+          throw new NotFoundException('Academy not found');
+        }
+
+        return {
+          role,
+          ...academy,
+        };
+      }
+
+      case Role.STUDENT: {
+        const student = await this.prisma.student.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            studentCode: true,
+            name: true,
+            phone: true,
+            status: true,
+            academy: {
+              select: {
+                id: true,
+                academyCode: true,
+                academyName: true,
+              },
+            },
+            course: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+              },
+            },
+          },
+        });
+
+        if (!student) {
+          throw new NotFoundException('Student not found');
+        }
+
+        return {
+          role,
+          ...student,
+        };
+      }
+
+      default:
+        throw new ForbiddenException('Invalid role');
+    }
   }
 }
