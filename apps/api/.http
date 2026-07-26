@@ -32,3 +32,23 @@ Content-Type: application/json
 
 ###-
 GET {{base_url}}/auth/profile
+
+
+###-
+POST {{base_url}}/admin/courses
+Content-Type: application/json
+
+{
+  "code": "BCA",
+  "name": "Bachelor of Computer Applications",
+  "description": "Three year undergraduate program.",
+  "modules": [
+    "Semester 1",
+    "Semester 2",
+    "Semester 3"
+  ]
+}
+
+
+###-
+GET {{base_url}}/admin/courses
