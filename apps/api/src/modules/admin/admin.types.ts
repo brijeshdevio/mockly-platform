@@ -35,3 +35,44 @@ export type UpdateCourseResponse = {
   isActive: boolean;
   updatedAt: Date;
 };
+
+export type CreateTestResponse = {
+  id: string;
+  title: string;
+  description: string | null;
+  durationInMinutes: number;
+  passingPercentage: number;
+  isPublished: boolean;
+  createdAt: Date;
+};
+
+export type TestListItemResponse = {
+  id: string;
+  title: string;
+  description: string | null;
+  durationInMinutes: number;
+  passingPercentage: number;
+  isPublished: boolean;
+  totalQuestions: number;
+  createdAt: Date;
+};
+
+export type GetTestsResponse = {
+  items: TestListItemResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+export type UpdateTestResponse = {
+  id: string;
+  title: string;
+  description: string | null;
+  durationInMinutes: number;
+  passingPercentage: number;
+  isPublished: boolean;
+  updatedAt: Date;
+};

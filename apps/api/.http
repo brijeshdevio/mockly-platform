@@ -52,3 +52,20 @@ Content-Type: application/json
 
 ###-
 GET {{base_url}}/admin/courses
+
+
+###-
+POST {{base_url}}/admin/tests
+Content-Type: application/json
+
+{
+  "title": "JavaScript Mock Test 1",
+  "description": "Basic JavaScript assessment",
+  "durationInMinutes": 60,
+  "passingPercentage": 50,
+  "isPublished": false
+}
+
+
+###-
+GET {{base_url}}/admin/tests
