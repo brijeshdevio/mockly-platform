@@ -76,3 +76,49 @@ export type UpdateTestResponse = {
   isPublished: boolean;
   updatedAt: Date;
 };
+
+export type CreateQuestionResponse = {
+  id: string;
+  question: string;
+  optionA: string;
+  optionB: string;
+  optionC: string | null;
+  optionD: string | null;
+  correctOption: string;
+  explanation: string | null;
+  createdAt: Date;
+};
+
+export type QuestionListItemResponse = {
+  id: string;
+  question: string;
+  optionA: string;
+  optionB: string;
+  optionC: string | null;
+  optionD: string | null;
+  correctOption: string;
+  explanation: string | null;
+  createdAt: Date;
+};
+
+export type GetQuestionsResponse = {
+  items: QuestionListItemResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+export type UpdateQuestionResponse = {
+  id: string;
+  question: string;
+  optionA: string;
+  optionB: string;
+  optionC: string | null;
+  optionD: string | null;
+  correctOption: string;
+  explanation: string | null;
+  updatedAt: Date;
+};

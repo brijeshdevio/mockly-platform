@@ -69,3 +69,22 @@ Content-Type: application/json
 
 ###-
 GET {{base_url}}/admin/tests
+
+
+###-
+POST {{base_url}}/admin/questions
+Content-Type: application/json
+
+{
+  "question": "Which keyword is used to declare a constant in JavaScript?",
+  "optionA": "const",
+  "optionB": "let",
+  "optionC": "var",
+  "optionD": "static",
+  "correctOption": "A",
+  "explanation": "The const keyword creates a block-scoped constant."
+}
+
+
+###-
+GET {{base_url}}/admin/questions

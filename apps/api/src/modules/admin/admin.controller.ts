@@ -12,7 +12,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
 
 import { apiSuccessResponse } from '../../common/helpers';
 
-import { CourseService, TestService } from './services';
+import { CourseService, QuestionService, TestService } from './services';
 import { CreateCourseDto, CreateCourseSchema } from './dto/create-course.dto';
 import {
   GetCoursesQueryDto,
@@ -25,12 +25,25 @@ import {
   GetTestsQuerySchema,
 } from './dto/get-tests-query.dto';
 import { UpdateTestDto, UpdateTestSchema } from './dto/update-test.dto';
+import {
+  CreateQuestionDto,
+  CreateQuestionSchema,
+} from './dto/create-question.dto';
+import {
+  GetQuestionsQueryDto,
+  GetQuestionsQuerySchema,
+} from './dto/get-questions-query';
+import {
+  UpdateQuestionDto,
+  UpdateQuestionSchema,
+} from './dto/update-question.dto';
 
 @Controller('admin')
 export class AdminController {
   constructor(
     private readonly courseService: CourseService,
     private readonly testService: TestService,
+    private readonly questionService: QuestionService,
   ) {}
 
   @Post('courses')
@@ -93,5 +106,42 @@ export class AdminController {
     const data = await this.testService.updateTest(id, body);
 
     return apiSuccessResponse({ message: 'Test updated successfully', data });
+  }
+
+  @Post('questions')
+  async createQuestion(
+    @Body(new ZodValidationPipe(CreateQuestionSchema))
+    body: CreateQuestionDto,
+  ) {
+    const data = await this.questionService.createQuestion(body);
+
+    return apiSuccessResponse({
+      message: 'Question created successfully',
+      data,
+    });
+  }
+
+  @Get('questions')
+  async getQuestions(
+    @Query(new ZodValidationPipe(GetQuestionsQuerySchema))
+    query: GetQuestionsQueryDto,
+  ) {
+    const data = await this.questionService.getQuestions(query);
+
+    return apiSuccessResponse({ data });
+  }
+
+  @Patch('questions/:id')
+  async updateQuestion(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(UpdateQuestionSchema))
+    body: UpdateQuestionDto,
+  ) {
+    const data = await this.questionService.updateQuestion(id, body);
+
+    return apiSuccessResponse({
+      message: 'Question updated successfully',
+      data,
+    });
   }
 }
