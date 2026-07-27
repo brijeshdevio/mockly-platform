@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from '../../../prisma/prisma.service';
 import { Prisma } from '../../../generated/prisma/client';
@@ -7,10 +11,12 @@ import { CreateTestDto } from '../dto/create-test.dto';
 import { GetTestsQueryDto } from '../dto/get-tests-query.dto';
 import { UpdateTestDto } from '../dto/update-test.dto';
 import {
+  AddTestQuestionsResponse,
   CreateTestResponse,
   GetTestsResponse,
   UpdateTestResponse,
 } from '../admin.types';
+import { AddTestQuestionsDto } from '../dto/add-test-questions.dto';
 
 @Injectable()
 export class TestService {
@@ -142,5 +148,67 @@ export class TestService {
         updatedAt: true,
       },
     });
+  }
+
+  async addQuestions(
+    testId: string,
+    body: AddTestQuestionsDto,
+  ): Promise<AddTestQuestionsResponse> {
+    const test = await this.prisma.test.findUnique({
+      where: {
+        id: testId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+
+    const questions = await this.prisma.question.findMany({
+      where: {
+        id: {
+          in: body.questionIds,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (questions.length !== body.questionIds.length) {
+      throw new NotFoundException('One or more questions were not found');
+    }
+
+    const existingQuestions = await this.prisma.testQuestion.findMany({
+      where: {
+        testId,
+        questionId: {
+          in: body.questionIds,
+        },
+      },
+      select: {
+        questionId: true,
+      },
+    });
+
+    if (existingQuestions.length > 0) {
+      throw new ConflictException(
+        'One or more questions are already added to this test',
+      );
+    }
+
+    await this.prisma.testQuestion.createMany({
+      data: body.questionIds.map((questionId) => ({
+        testId,
+        questionId,
+      })),
+    });
+
+    return {
+      addedCount: body.questionIds.length,
+    };
   }
 }

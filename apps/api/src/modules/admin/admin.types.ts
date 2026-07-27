@@ -77,6 +77,10 @@ export type UpdateTestResponse = {
   updatedAt: Date;
 };
 
+export type AddTestQuestionsResponse = {
+  addedCount: number;
+};
+
 export type CreateQuestionResponse = {
   id: string;
   question: string;

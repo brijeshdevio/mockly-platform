@@ -37,6 +37,10 @@ import {
   UpdateQuestionDto,
   UpdateQuestionSchema,
 } from './dto/update-question.dto';
+import {
+  AddTestQuestionsDto,
+  AddTestQuestionsSchema,
+} from './dto/add-test-questions.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -106,6 +110,20 @@ export class AdminController {
     const data = await this.testService.updateTest(id, body);
 
     return apiSuccessResponse({ message: 'Test updated successfully', data });
+  }
+
+  @Post('tests/:id/questions')
+  async addTestQuestions(
+    @Param('id') testId: string,
+    @Body(new ZodValidationPipe(AddTestQuestionsSchema))
+    body: AddTestQuestionsDto,
+  ) {
+    const data = await this.testService.addQuestions(testId, body);
+
+    return apiSuccessResponse({
+      message: 'Questions added successfully',
+      data,
+    });
   }
 
   @Post('questions')
